@@ -10,7 +10,14 @@ public class GroceryBudgetTrackerUI {
     private JFrame frame;
     private JLabel label;
     private JLabel totalLabel;
+    private JLabel budgetLabel;
+    private double budget;
+
     private ArrayList<GroceryItem> groceryList;
+
+    public double getBudget(){
+        return budget;
+    }
 
     public static void main(String[] args) {
         GroceryBudgetTrackerUI window = new GroceryBudgetTrackerUI();
@@ -21,7 +28,7 @@ public class GroceryBudgetTrackerUI {
         groceryList = new ArrayList<>();
 
         frame = new JFrame("Grocery Budget Tracker");
-        frame.setBounds(100, 100, 400, 200);
+        frame.setBounds(100, 200, 500, 200);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel();
@@ -37,6 +44,16 @@ public class GroceryBudgetTrackerUI {
         label = new JLabel("Welcome to Grocery Budget Tracker!");
         label.setBounds(10, 20, 300, 25);
         panel.add(label);
+
+        JButton setBudget = new JButton("Set Budget:");
+        setBudget.setBounds(100,100,150,25);
+        setBudget.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                budget();
+            }
+        });
+        panel.add(setBudget);
 
         JButton addButton = new JButton("Add Item");
         addButton.setBounds(10, 60, 120, 25);
@@ -65,9 +82,27 @@ public class GroceryBudgetTrackerUI {
         });
         panel.add(calculateButton);
 
+        budgetLabel= new JLabel("You are in budget!");
+        budgetLabel.setBounds(270,100,300,25);
+        panel.add(budgetLabel);
+
         totalLabel = new JLabel("Total: $0.00");
         totalLabel.setBounds(10, 100, 150, 25);
         panel.add(totalLabel);
+    }
+    private void budget(){
+        JTextField budgetAmount = new JTextField();
+        Object[] fields = {"Enter Amount:",budgetAmount};
+        int result = javax.swing.JOptionPane.showConfirmDialog(null, fields, "Enter Amount:", javax.swing.JOptionPane.OK_CANCEL_OPTION);
+
+        if (result == javax.swing.JOptionPane.OK_OPTION) {
+            try {
+                budget = Double.parseDouble(budgetAmount.getText());
+                budgetLabel.setText("Budget set to $" + String.format("%.2f", budget));
+            } catch (NumberFormatException e) {
+                javax.swing.JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid number for the budget.");
+            }
+        }
     }
 
     private void addItem() {
@@ -117,6 +152,13 @@ public class GroceryBudgetTrackerUI {
             total += groceryList.get(i).price;
         }
         totalLabel.setText("Total: $" + String.format("%.2f", total));
+        double budget = getBudget();
+        if (total > budget) {
+            double over = total - budget;
+            budgetLabel.setText("You are over budget by $" + String.format("%.2f", over));
+        } else {
+            budgetLabel.setText("You are within budget!");
+        }
     }
 
     private static class GroceryItem {
@@ -127,6 +169,7 @@ public class GroceryBudgetTrackerUI {
             this.name = name;
             this.price = price;
         }
+
     }
 }
 

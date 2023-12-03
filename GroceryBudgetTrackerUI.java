@@ -1,6 +1,9 @@
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -138,27 +141,30 @@ public class GroceryBudgetTrackerUI {
     }
 
     private void deleteItem() {
-        JTextField nameField = new JTextField();
+        JMenuBar groceryMenu = getGroceryList();
+        if (groceryMenu != null) {
 
-        Object[] fields = { "Item Name:", nameField };
+            Object[] fields = { "Selected an item to remove:", groceryMenu };
 
-        int result = javax.swing.JOptionPane.showConfirmDialog(null, fields, "Delete Item",
-                javax.swing.JOptionPane.OK_CANCEL_OPTION);
+            int result = javax.swing.JOptionPane.showConfirmDialog(null, fields, "Delete Item",
+                    javax.swing.JOptionPane.OK_CANCEL_OPTION);
 
-        if (result == javax.swing.JOptionPane.OK_OPTION) {
-            String nameToDelete = nameField.getText();
-
-            for (GroceryItem item : groceryList) {
-                if (item.name.equalsIgnoreCase(nameToDelete)) {
-                    groceryList.remove(item);
-                    javax.swing.JOptionPane.showInternalMessageDialog(null, item.name + " removed from the list.");
-                    System.out.println(item.name + " removed from the list.");
-                    return;
+            if (result == javax.swing.JOptionPane.OK_OPTION) {
+                String nameToDelete = groceryMenu.getMenu(0).getText();
+                for (GroceryItem item : groceryList) {
+                    if (item.name.equalsIgnoreCase(nameToDelete)) {
+                        groceryList.remove(item);
+                        javax.swing.JOptionPane.showInternalMessageDialog(null, item.name + " removed from the list.");
+                        System.out.println(item.name + " removed from the list.");
+                        return;
+                    }
                 }
-            }
 
-            javax.swing.JOptionPane.showInternalMessageDialog(null, "Item not found in the list.");
-            System.out.println("Item not found in the list.");
+                javax.swing.JOptionPane.showInternalMessageDialog(null, "Item not found in the list.");
+                System.out.println("Item not found in the list.");
+            }
+        } else {
+            javax.swing.JOptionPane.showInternalMessageDialog(null, "Grocery list is currently empty.");
         }
     }
 
@@ -175,6 +181,25 @@ public class GroceryBudgetTrackerUI {
         } else {
             budgetLabel.setText("You are within budget!");
         }
+    }
+
+    private JMenuBar getGroceryList() {
+        if (!groceryList.isEmpty()) {
+            JMenuBar groceryMenuBar = new JMenuBar();
+            JMenu groceryMenu = new JMenu("Groccery List");
+            for (GroceryItem groceryItem : groceryList) {
+                JMenuItem menuItem = new JMenuItem(groceryItem.name);
+                menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        groceryMenu.setText(menuItem.getText());
+                    }
+                });
+                groceryMenu.add(menuItem);
+            }
+            groceryMenuBar.add(groceryMenu);
+            return groceryMenuBar;
+        } else
+            return null;
     }
 
     private static class GroceryItem {

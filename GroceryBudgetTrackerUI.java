@@ -2,10 +2,14 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+
 public class GroceryBudgetTrackerUI {
     private JFrame frame;
     private JLabel label;
@@ -15,7 +19,7 @@ public class GroceryBudgetTrackerUI {
 
     private ArrayList<GroceryItem> groceryList;
 
-    public double getBudget(){
+    public double getBudget() {
         return budget;
     }
 
@@ -46,7 +50,7 @@ public class GroceryBudgetTrackerUI {
         panel.add(label);
 
         JButton setBudget = new JButton("Set Budget:");
-        setBudget.setBounds(100,100,150,25);
+        setBudget.setBounds(100, 100, 150, 25);
         setBudget.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -82,25 +86,28 @@ public class GroceryBudgetTrackerUI {
         });
         panel.add(calculateButton);
 
-        budgetLabel= new JLabel("You are in budget!");
-        budgetLabel.setBounds(270,100,300,25);
+        budgetLabel = new JLabel("You are in budget!");
+        budgetLabel.setBounds(270, 100, 300, 25);
         panel.add(budgetLabel);
 
         totalLabel = new JLabel("Total: $0.00");
         totalLabel.setBounds(10, 100, 150, 25);
         panel.add(totalLabel);
     }
-    private void budget(){
+
+    private void budget() {
         JTextField budgetAmount = new JTextField();
-        Object[] fields = {"Enter Amount:",budgetAmount};
-        int result = javax.swing.JOptionPane.showConfirmDialog(null, fields, "Enter Amount:", javax.swing.JOptionPane.OK_CANCEL_OPTION);
+        Object[] fields = { "Enter Amount:", budgetAmount };
+        int result = javax.swing.JOptionPane.showConfirmDialog(null, fields, "Enter Amount:",
+                javax.swing.JOptionPane.OK_CANCEL_OPTION);
 
         if (result == javax.swing.JOptionPane.OK_OPTION) {
             try {
                 budget = Double.parseDouble(budgetAmount.getText());
                 budgetLabel.setText("Budget set to $" + String.format("%.2f", budget));
             } catch (NumberFormatException e) {
-                javax.swing.JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid number for the budget.");
+                javax.swing.JOptionPane.showMessageDialog(null,
+                        "Invalid input. Please enter a valid number for the budget.");
             }
         }
     }
@@ -108,18 +115,24 @@ public class GroceryBudgetTrackerUI {
     private void addItem() {
         JTextField nameField = new JTextField();
         JTextField priceField = new JTextField();
+        SpinnerNumberModel itemCounter = new SpinnerNumberModel(1, 1, 100, 1);
+        JSpinner quantityField = new JSpinner(itemCounter);
 
-        Object[] fields = {"Item Name:", nameField, "Item Price:", priceField};
+        Object[] fields = { "Item Name:", nameField, "Item Price:", priceField, "Item Count:", quantityField };
 
-        int result = javax.swing.JOptionPane.showConfirmDialog(null, fields, "Add Item", javax.swing.JOptionPane.OK_CANCEL_OPTION);
+        int result = javax.swing.JOptionPane.showConfirmDialog(null, fields, "Add Item",
+                javax.swing.JOptionPane.OK_CANCEL_OPTION);
 
         if (result == javax.swing.JOptionPane.OK_OPTION) {
+            int itemCount = (int) quantityField.getValue();
             String name = nameField.getText();
             double price = Double.parseDouble(priceField.getText());
+            for (int count = 0; count < itemCount; count++) {
+                GroceryItem newItem = new GroceryItem(name, price);
+                groceryList.add(newItem);
+            }
 
-            GroceryItem newItem = new GroceryItem(name, price);
-            groceryList.add(newItem);
-
+            javax.swing.JOptionPane.showInternalMessageDialog(null, name + " added to the list.");
             System.out.println(name + " added to the list.");
         }
     }
@@ -127,9 +140,10 @@ public class GroceryBudgetTrackerUI {
     private void deleteItem() {
         JTextField nameField = new JTextField();
 
-        Object[] fields = {"Item Name:", nameField};
+        Object[] fields = { "Item Name:", nameField };
 
-        int result = javax.swing.JOptionPane.showConfirmDialog(null, fields, "Delete Item", javax.swing.JOptionPane.OK_CANCEL_OPTION);
+        int result = javax.swing.JOptionPane.showConfirmDialog(null, fields, "Delete Item",
+                javax.swing.JOptionPane.OK_CANCEL_OPTION);
 
         if (result == javax.swing.JOptionPane.OK_OPTION) {
             String nameToDelete = nameField.getText();
@@ -137,11 +151,13 @@ public class GroceryBudgetTrackerUI {
             for (GroceryItem item : groceryList) {
                 if (item.name.equalsIgnoreCase(nameToDelete)) {
                     groceryList.remove(item);
+                    javax.swing.JOptionPane.showInternalMessageDialog(null, item.name + " removed from the list.");
                     System.out.println(item.name + " removed from the list.");
                     return;
                 }
             }
 
+            javax.swing.JOptionPane.showInternalMessageDialog(null, "Item not found in the list.");
             System.out.println("Item not found in the list.");
         }
     }
@@ -172,4 +188,3 @@ public class GroceryBudgetTrackerUI {
 
     }
 }
-

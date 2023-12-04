@@ -9,7 +9,10 @@ public class GroceryBudgetTrackerUI {
     private JLabel label;
     private JLabel totalLabel;
     private JLabel budgetLabel;
+    private JLabel budgetAlertLabel;
+    private JLabel spendAmountLabel;
     private double budget;
+    private double spendAmount = 0;
 
     private ArrayList<GroceryItem> groceryList;
 
@@ -40,11 +43,11 @@ public class GroceryBudgetTrackerUI {
         panel.setLayout(null);
 
         label = new JLabel("Welcome to Grocery Budget Tracker!");
-        label.setBounds(10, 20, 300, 25);
+        label.setBounds(135, 20, 300, 25);
         panel.add(label);
 
         JButton setBudget = new JButton("Set Budget:");
-        setBudget.setBounds(100, 100, 150, 25);
+        setBudget.setBounds(120, 100, 150, 25);
         setBudget.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -71,29 +74,30 @@ public class GroceryBudgetTrackerUI {
         });
         panel.add(deleteButton);
 
-        JButton calculateButton = new JButton("Calculate Total");
-        calculateButton.setBounds(270, 60, 120, 25);
-        calculateButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                calculateTotal();
-            }
-        });
-        panel.add(calculateButton);
-
         JButton groceryList = new JButton("Grocery List");
-        groceryList.setBounds(10, 165, 120, 25);
+        groceryList.setBounds(10, 155, 120, 25);
         groceryList.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {displayGroceryList();}
+            public void actionPerformed(ActionEvent e) {
+                displayGroceryList();
+            }
         });
         panel.add(groceryList);
 
-        budgetLabel = new JLabel("You are in budget!");
-        budgetLabel.setBounds(270, 100, 300, 25);
-        panel.add(budgetLabel);
+        budgetAlertLabel = new JLabel("You are in budget!");
+        budgetAlertLabel.setBounds(270, 100, 300, 25);
+        panel.add(budgetAlertLabel);
 
         totalLabel = new JLabel("Total: $0.00");
         totalLabel.setBounds(10, 100, 150, 25);
         panel.add(totalLabel);
+
+        budgetLabel = new JLabel("Budget: $0.00");
+        budgetLabel.setBounds(10, 130, 150, 25);
+        panel.add(budgetLabel);
+
+        spendAmountLabel = new JLabel("Amount available to spend: $0.00");
+        spendAmountLabel.setBounds(150, 130, 250, 25);
+        panel.add(spendAmountLabel);
     }
 
     private void budget() {
@@ -105,7 +109,10 @@ public class GroceryBudgetTrackerUI {
         if (result == javax.swing.JOptionPane.OK_OPTION) {
             try {
                 budget = Double.parseDouble(budgetAmount.getText());
-                budgetLabel.setText("Budget set to $" + String.format("%.2f", budget));
+                budgetAlertLabel.setText("Budget set to $" + String.format("%.2f", budget));
+                budgetLabel.setText("Budget: $" + String.format("%.2f", budget));
+                System.out.println(budget);
+                calculateSpendAmount();
             } catch (NumberFormatException e) {
                 javax.swing.JOptionPane.showMessageDialog(null,
                         "Invalid input. Please enter a valid number for the budget.");
@@ -113,13 +120,11 @@ public class GroceryBudgetTrackerUI {
         }
     }
 
-    private void displayGroceryList()
-    {
+    private void displayGroceryList() {
         // Create JTextArea
         JTextArea myArea = new JTextArea(groceryList.size(), 2);
         // Add name and price of GroceryList to myArea
-        for (int i = 0; i < myArea.getRows(); i++)
-        {
+        for (int i = 0; i < myArea.getRows(); i++) {
             myArea.append("Name: " + groceryList.get(i).name + " Price: " + Double.toString(groceryList.get(i).price));
             myArea.append("\n");
         }
@@ -156,6 +161,8 @@ public class GroceryBudgetTrackerUI {
 
             javax.swing.JOptionPane.showInternalMessageDialog(null, name + " added to the list.");
             System.out.println(name + " added to the list.");
+            calculateTotal();
+            calculateSpendAmount();
         }
     }
 
@@ -175,6 +182,8 @@ public class GroceryBudgetTrackerUI {
                         groceryList.remove(item);
                         javax.swing.JOptionPane.showInternalMessageDialog(null, item.name + " removed from the list.");
                         System.out.println(item.name + " removed from the list.");
+                        calculateTotal();
+                        calculateSpendAmount();
                         return;
                     }
                 }
@@ -196,10 +205,19 @@ public class GroceryBudgetTrackerUI {
         double budget = getBudget();
         if (total > budget) {
             double over = total - budget;
-            budgetLabel.setText("You are over budget by $" + String.format("%.2f", over));
+            budgetAlertLabel.setText("You are over budget by $" + String.format("%.2f", over));
         } else {
-            budgetLabel.setText("You are within budget!");
+            budgetAlertLabel.setText("You are within budget!");
         }
+    }
+
+    private void calculateSpendAmount() {
+        double total = 0;
+        for (int i = 0; i < groceryList.size(); i++) {
+            total += groceryList.get(i).price;
+        }
+        spendAmount = budget - total;
+        spendAmountLabel.setText("Amount available to spend: $" + String.format("%.2f", spendAmount));
     }
 
     private JMenuBar getGroceryList() {

@@ -1,13 +1,4 @@
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -89,6 +80,13 @@ public class GroceryBudgetTrackerUI {
         });
         panel.add(calculateButton);
 
+        JButton groceryList = new JButton("Grocery List");
+        groceryList.setBounds(10, 165, 120, 25);
+        groceryList.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {displayGroceryList();}
+        });
+        panel.add(groceryList);
+
         budgetLabel = new JLabel("You are in budget!");
         budgetLabel.setBounds(270, 100, 300, 25);
         panel.add(budgetLabel);
@@ -113,6 +111,27 @@ public class GroceryBudgetTrackerUI {
                         "Invalid input. Please enter a valid number for the budget.");
             }
         }
+    }
+
+    private void displayGroceryList()
+    {
+        // Create JTextArea
+        JTextArea myArea = new JTextArea(groceryList.size(), 2);
+        // Add name and price of GroceryList to myArea
+        for (int i = 0; i < myArea.getRows(); i++)
+        {
+            myArea.append("Name: " + groceryList.get(i).name + " Price: " + Double.toString(groceryList.get(i).price));
+            myArea.append("\n");
+        }
+        // Create scroll
+        JScrollPane scrollPane = new JScrollPane(myArea);
+        // Set preferred size
+        myArea.setSize(myArea.getPreferredSize().width, myArea.getPreferredSize().height);
+        // turn off editing
+        myArea.setEditable(false);
+        // create popup
+        JOptionPane.showMessageDialog(null, scrollPane, "Grocery List", JOptionPane.INFORMATION_MESSAGE);
+
     }
 
     private void addItem() {
